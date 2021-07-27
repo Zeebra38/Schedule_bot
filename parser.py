@@ -30,7 +30,7 @@ def find_links():
     all_a = soup.find('ul', class_="uk-switcher uk-margin").find('li').find_all('a')
     links = []
     for a in all_a:
-        if 'webservices' in a['href'] and '.xlsx' in a['href']:
+        if 'webservices' in a['href'] and '.xlsx' in a['href'] and 'КБиСП' in a['href']: #убрать потом КБиСП
             links.append(a['href'])
     return links
 

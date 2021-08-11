@@ -46,7 +46,26 @@ class Subject:
 
 
 class MultiSubject:
-    """Используется, когда в строке несколько различных предметов"""
+    """Используется, когда в строке несколько различных предметов. Передаются все параметры, также, как и в обычном
+    классе Subject. Будет происходить split по '\n'. Чтобы обращаться к предметам внутри есть свойство subjects,
+    возвращающее массив Subject"""
 
-    def __init__(self):
-        pass
+    def __init__(self, group_name, number, even, subj, _type, instructor, _class, link):
+        def increase_arguments(a, b):
+            if len(a) < len(b):
+                for _ in range(len(b) - len(a)):
+                    a.append('')
+            return a
+        subjs = subj.split('\n')
+        types = _type.split('\n')
+        instructors = instructor.split('\n')
+        classes = _class.split('\n')
+        links = link.split('\n')
+        instructors = increase_arguments(instructors, subjs)
+        classes = increase_arguments(classes, subjs)
+        links = increase_arguments(links, subjs)
+        self.subjects = []
+        for subj, _type, instructor, _class, link in zip(subjs, types, instructors, classes, links):
+            self.subjects.append(Subject(group_name, number, even, subj, _type, instructor, _class, link))
+
+

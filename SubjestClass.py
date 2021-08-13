@@ -17,6 +17,8 @@ class Subject:
         self._class = _class
         self.link = link
         self.name, self.weeks = self.set_up_subject(subj, even)
+        self.ready_to_insert_data = [self.number, self.even, " ".join(self.weeks), self.name, self._type,
+                                     self.instructor, self._class, self.link]
 
     def set_up_subject(self, subj, even):
         pattern = r"[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?"
@@ -44,6 +46,9 @@ class Subject:
         self.weeks = weeks
         return name, weeks
 
+    def __str__(self):
+        return self.ready_to_insert_data
+
 
 class MultiSubject:
     """Используется, когда в строке несколько различных предметов. Передаются все параметры, также, как и в обычном
@@ -56,6 +61,7 @@ class MultiSubject:
                 for _ in range(len(b) - len(a)):
                     a.append('')
             return a
+
         subjs = subj.split('\n')
         types = _type.split('\n')
         instructors = instructor.split('\n')
@@ -67,5 +73,3 @@ class MultiSubject:
         self.subjects = []
         for subj, _type, instructor, _class, link in zip(subjs, types, instructors, classes, links):
             self.subjects.append(Subject(group_name, number, even, subj, _type, instructor, _class, link))
-
-

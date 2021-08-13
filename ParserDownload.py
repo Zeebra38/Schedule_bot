@@ -1,9 +1,9 @@
-import bs4
-import re
+import os
+import shutil
+import threading
+
 import requests
-import functools
 from bs4 import BeautifulSoup
-import os, shutil, threading
 
 
 def download(link: str, barrier):

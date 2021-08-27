@@ -62,7 +62,7 @@ class Schedule:
     def select_day_by_user(self, day: str, user: User):
         cur = self.cur
         cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
-        group_id = cur.fetchone()
+        group_id = str(cur.fetchone())
         cur.execute(
             """select G.group_name, D.number, D.even, D.weeks, D.Subject, D.Instructor, D.Type, D.Class, D.Link 
             from {} D 
@@ -70,3 +70,4 @@ class Schedule:
             where D.group_id = (?)
             order by D.number""".format(
                 day), [group_id])
+        print(cur.fetchall())

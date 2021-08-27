@@ -49,7 +49,7 @@ def ParserTable(name_table):
             #print('Бпбо-02-19 находится в ячейке:', column_min, " ", row_min_min)
             #print(get_column_letter(column_min), get_column_letter(column_min+4))
             cells = sheet[get_column_letter(column_min)+'4':get_column_letter(column_min+4)+'75']
-            chetnost = 1
+            chetnost = 0
             NomerPar = 2
             DenNedeli = 4
             subjets = []
@@ -57,16 +57,18 @@ def ParserTable(name_table):
 
                 if NomerPar == 14:
                     NomerPar -= 12
+                    schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), subjets)
+                    subjets.clear()
                     DenNedeli += 12
 
 
                 if item.value != None and "\n" in item.value:
-                    ForMultiSubject = MultiSubject(data_from_cell, NomerPar, chetnost % 2, item.value, vid_zanyatiy.value,
+                    ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value, vid_zanyatiy.value,
                                                     FIO.value, nomer.value, ssilka.value)
                     schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), ForMultiSubject.subjects)#инглишменский день
 
                 elif item.value != None:
-                    ForSubject = Subject(data_from_cell, NomerPar, chetnost % 2, item.value, vid_zanyatiy.value,
+                    ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value, vid_zanyatiy.value,
                                                     FIO.value, nomer.value, ssilka.value)
                     subjets.append(ForSubject)
 
@@ -74,7 +76,7 @@ def ParserTable(name_table):
                        ssilka.value, NomerPar//2, sheet[DenNedeli][0].value, chetnost % 2)
                 chetnost += 1
                 NomerPar += 1
-            schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), subjets)
+
             break
 
         row_min_min = int(row_min_min)
@@ -122,11 +124,12 @@ def GroupsList():
                 #print('Нашли в ячейке:', column_min, " ", row_min_min)
                 #print(data_from_cell)
                 #print(sheet[2][int(column_min) - 1].value[0:10])
-                GroupList += [sheet[2][int(column_min) - 1].value[0:10]]
+                GroupList.append(sheet[2][int(column_min) - 1].value[0:10])
         row_min_min = int(row_min_min)
 
         column_min = column_min + 1
-    print(GroupList)
+    return GroupList
 
 #GroupsList()
+schedule.insert_groups(GroupsList())
 ParserTable(1)

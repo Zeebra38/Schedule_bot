@@ -18,10 +18,14 @@ class Schedule:
         "group_id" INTEGER NOT NULL UNIQUE,
         "group_name"	TEXT NOT NULL UNIQUE,
         PRIMARY KEY("group_id" AUTOINCREMENT));""")
-        cur.executemany("insert into Groups(group_name) values (?)", [groups])
+        # cur.execute("insert into Groups(group_name) values (?)", (groups, ))
+        for group in groups:
+            cur.execute("insert into Groups(group_name) values (?)", [group])
+        # cur.executemany("insert into Groups(group_name) values (?)", groups) #todo НЕ РАБОТЕТ
         # self.con.commit()
         cur.execute("select * from Groups")
         print(cur.fetchall())
+        self.con.commit()
 
     def insert_subject(self, day: str, subject: Subject):
         cur = self.cur
@@ -44,6 +48,7 @@ class Schedule:
         cur.execute("select * from {}".format(day))
         all_result = cur.fetchall()
         print(all_result)
+        self.con.commit()
 
     def insert_user(self, user: User):
         cur = self.cur

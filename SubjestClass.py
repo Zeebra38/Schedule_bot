@@ -21,6 +21,7 @@ class Subject:
                                      self.instructor, self._class, self.link]
 
     def set_up_subject(self, subj, even):
+        subj = subj.replace('.', ',').replace(',', ' ')
         pattern = r"[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?"
         odd_weeks = '1 3 5 7 9 11 13 15'.split()
         even_weeks = '2 4 6 8 10 12 14 16'.split()
@@ -44,6 +45,9 @@ class Subject:
             name = subj[subj.find('н') + 1:].strip()
 
         self.weeks = weeks
+        if len(self.weeks) >= 2:
+            if int(self.weeks[-1]) < int(self.weeks[-2]):
+                self.weeks.pop(-1)
         return name, weeks
 
     def __str__(self):
@@ -59,7 +63,7 @@ class MultiSubject:
         def increase_arguments(a, b):
             if len(a) < len(b):
                 for _ in range(len(b) - len(a)):
-                    a.append('')
+                    a.append(a[0])
             return a
         _class = str(_class)
         if link is None:
@@ -71,6 +75,7 @@ class MultiSubject:
         instructors = instructor.split('\n')
         classes = _class.split('\n')
         links = link.split('\n')
+        types = increase_arguments(types, subjs)
         instructors = increase_arguments(instructors, subjs)
         classes = increase_arguments(classes, subjs)
         links = increase_arguments(links, subjs)

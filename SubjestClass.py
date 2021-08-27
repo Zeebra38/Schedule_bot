@@ -61,7 +61,11 @@ class MultiSubject:
                 for _ in range(len(b) - len(a)):
                     a.append('')
             return a
-
+        _class = str(_class)
+        if link is None:
+            link = ''
+        if instructor is None:
+            instructor = ''
         subjs = subj.split('\n')
         types = _type.split('\n')
         instructors = instructor.split('\n')

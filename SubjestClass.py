@@ -12,10 +12,10 @@ class Subject:
         self.group_name = group_name
         self.number = number
         self.even = even
-        self._type = _type if _type is not None else '---'
-        self.instructor = instructor if instructor is not None else '---'
-        self._class = str(_class) if _class is not None else '---'
-        self.link = link if link is not None else '---'
+        self._type = _type if _type is not None else ''
+        self.instructor = instructor if instructor is not None else ''
+        self._class = str(_class) if _class is not None else ''
+        self.link = link if link is not None else ''
         self.name, self.weeks = self.set_up_subject(subj, even)
         self.ready_to_insert_data = [self.number, self.even, " ".join(self.weeks), self.name, self._type,
                                      self.instructor, self._class, self.link]

@@ -2,6 +2,7 @@ import sqlite3
 
 from SubjestClass import Subject
 from UserClass import User
+from utils import weeknum
 
 
 class Schedule:
@@ -24,7 +25,7 @@ class Schedule:
         # cur.executemany("insert into Groups(group_name) values (?)", groups) #todo НЕ РАБОТЕТ
         # self.con.commit()
         cur.execute("select * from Groups")
-        print(cur.fetchall())
+        # print(cur.fetchall())
         self.con.commit()
 
     def insert_subject(self, day: str, subject: Subject):
@@ -32,7 +33,7 @@ class Schedule:
         cur.execute("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day), subject.ready_to_insert_data)
         cur.execute("select * from {}".format(day))
         all_result = cur.fetchall()
-        print(all_result)
+        # print(all_result)
 
     def insert_subjects(self, day: str, subjects: [Subject]):
         cur = self.cur
@@ -47,7 +48,7 @@ class Schedule:
                         data)
         cur.execute("select * from {}".format(day))
         all_result = cur.fetchall()
-        print(all_result)
+        # print(all_result)
         self.con.commit()
 
     def insert_user(self, user: User):
@@ -62,12 +63,23 @@ class Schedule:
     def select_day_by_user(self, day: str, user: User):
         cur = self.cur
         cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
-        group_id = str(cur.fetchone())
+        group_id = int(str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', ''))
+        week = weeknum()
+        vars = [f'{week} %', f'% {week}', f'% {week} %']
         cur.execute(
             """select G.group_name, D.number, D.even, D.weeks, D.Subject, D.Instructor, D.Type, D.Class, D.Link 
-            from {} D 
+            from {day} D 
             left join Groups G on D.group_id = G.group_id
             where D.group_id = (?)
+            and (D.weeks like '{var1}' 
+            or D.weeks like '{var2}'
+            or D.weeks like '{var3}')
             order by D.number""".format(
-                day), [group_id])
+                day=day, var1=vars[0], var2=vars[1], var3=vars[2]), [group_id])
         print(cur.fetchall())
+
+# user = User('a','b', '123', '234', 'БЭСО-03-19')
+# schedule = Schedule()
+# schedule.select_day_by_user('Monday', user)
+# schedule.select_day_by_user('Tuesday', user)
+# schedule.select_day_by_user('Friday', user)

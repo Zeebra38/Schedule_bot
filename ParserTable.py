@@ -5,10 +5,18 @@ from SubjestClass import *
 from DataBase import Schedule
 from utils import translate_weekday
 import UserClass
-schedule = Schedule()
+from threading import *
+from time import time,sleep
+import os
 
-def ParserTableKBSP(name_table):
-    name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
+schedule = Schedule()
+GroupList = []
+
+subjects = {}
+multisubjects = {}
+
+def Parser_Table(name_table):
+    #name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
 
     table = openpyxl.open(name_table, read_only=True)
 
@@ -66,12 +74,16 @@ def ParserTableKBSP(name_table):
                     if item.value != None and "\n" in item.value:
                         ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value, vid_zanyatiy.value,
                                                         FIO.value, nomer.value, ssilka.value)
-                        schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), ForMultiSubject.subjects)#инглишменский день
+                        global multisubjects
+                        multisubjects[ForMultiSubject] = translate_weekday(sheet[DenNedeli][0].value)
+                        #schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), ForMultiSubject.subjects)#инглишменский день
 
                     elif item.value != None:
                         ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value, vid_zanyatiy.value,
                                                         FIO.value, nomer.value, ssilka.value)
-                        subjets.append(ForSubject)
+                        global subjects
+                        subjects[ForSubject] = translate_weekday(sheet[DenNedeli][0].value)
+                        #subjets.append(ForSubject)
 
                     print(item.value, vid_zanyatiy.value, FIO.value, nomer.value,
                            ssilka.value, NomerPar//2, sheet[DenNedeli][0].value, chetnost % 2)
@@ -87,8 +99,8 @@ def ParserTableKBSP(name_table):
     print(sheet[5][0].value) #row_min_min -1
     #return ForMultiSubject
 
-def GroupsList():
-    name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
+def Groups_List(name_table,barrier):
+    #name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
 
     table = openpyxl.open(name_table, read_only=True)
 
@@ -105,7 +117,8 @@ def GroupsList():
     # print(column_max, ' ', row_max) # проверка количества строк и столбцов
     row_min = 2
     column_min = 1
-    GroupList = []
+    global GroupList
+
     while column_min <= column_max:
         row_min_min = row_min
         row_max_max = row_max
@@ -121,17 +134,45 @@ def GroupsList():
         # print(data_from_cell)
         regular = search_text
         if len(data_from_cell) > 9:
-            if data_from_cell[4] == '-' and data_from_cell[7] == '-':
+            if data_from_cell[4] == '-' and data_from_cell[7] == '-' and data_from_cell[:10] not in GroupList:
                 #print('Нашли в ячейке:', column_min, " ", row_min_min)
                 #print(data_from_cell)
                 #print(sheet[2][int(column_min) - 1].value[0:10])
+
                 GroupList.append(sheet[2][int(column_min) - 1].value[0:10])
         row_min_min = int(row_min_min)
 
         column_min = column_min + 1
-    schedule.insert_groups(GroupList)
-    return GroupList
+    print(GroupList)
+    #return GroupList
+    barrier.wait()
 
-#GroupsList()
+def SchedulePars():
+
+    os.chdir('./schedules') #переход на работу с другой директорией
+    print(os.listdir()) # весь список всего
+    global GroupList
+    GroupList = []
+    barrier = Barrier(len(os.listdir())+1)
+    for NameTable12 in os.listdir(): #цикл для работы с списком ссего
+        GL = Thread(target = Groups_List, args=(NameTable12,barrier,))
+        GL.start()
+    barrier.wait()
+
+    schedule.insert_groups(GroupList)
+
+        # GL = Thread(target = GroupsList, args=(NameTable12,))
+        # GL.start()
+        # GL.join()
+
+    global subjects, multisubjects
+    subjects.clear()
+    multisubjects.clear()
+    for NameTable12 in os.listdir(): #цикл для работы с списком ссего
+        PT = Thread(target = Parser_Table, args=(NameTable12,))
+        PT.start()
+    PT.join()
+
+SchedulePars()
 #schedule.insert_groups(GroupsList())
 #ParserTable(1)

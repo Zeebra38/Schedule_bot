@@ -31,3 +31,7 @@ def user_schedule_on_week(telegram_id='', vk_id='', week=weeknum()):
     for day in days:
         res += user_schedule_on_day(telegram_id, vk_id, week, weekday=day) + '\n'
     return res
+
+
+def get_current_weeknum():
+    return f'Текущая неделя - {weeknum()}'

@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from settings import weekdays_ru
+
 
 
 def translate_weekday(weekday: str):
+    from settings import weekdays_ru
     weekday = weekday.lower().capitalize()
     return weekdays_ru[weekday]
 

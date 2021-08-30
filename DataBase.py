@@ -165,3 +165,4 @@ class Schedule:
         where group_id == (?)""", [group_id])
         res = str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', '').replace('\'', '')
         return res
+

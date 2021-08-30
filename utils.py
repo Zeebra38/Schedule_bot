@@ -1,18 +1,12 @@
 from datetime import datetime
+
+from settings import weekdays_ru
+
+
 def translate_weekday(weekday: str):
     weekday = weekday.lower().capitalize()
-    if weekday == 'Понедельник':
-        return 'Monday'
-    if weekday == 'Вторник':
-        return 'Tuesday'
-    if weekday == 'Среда':
-        return 'Wednesday'
-    if weekday == 'Четверг':
-        return 'Thursday'
-    if weekday == 'Пятница':
-        return 'Friday'
-    if weekday == 'Суббота':
-        return 'Saturday'
+    return weekdays_ru[weekday]
+
 
 def weeknum():
     zero = datetime(2021, 9, 1)
@@ -27,3 +21,18 @@ def weeknum():
             deltaweeks += 1
             buf = buf - 7
     return deltaweeks
+
+
+def get_subj_time(number: int):
+    if number == 1:
+        return '09:00-10:30'
+    if number == 2:
+        return '10:40-12:10'
+    if number == 3:
+        return '12:40-14:10'
+    if number == 4:
+        return '14:20-15:50'
+    if number == 5:
+        return '16:20-17:50'
+    if number == 6:
+        return '18:00-19:30'

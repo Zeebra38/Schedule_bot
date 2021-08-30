@@ -19,21 +19,14 @@ class Schedule:
         "group_id" INTEGER NOT NULL UNIQUE,
         "group_name"	TEXT NOT NULL UNIQUE,
         PRIMARY KEY("group_id" AUTOINCREMENT));""")
-        # cur.execute("insert into Groups(group_name) values (?)", (groups, ))
         for group in groups:
             cur.execute("insert into Groups(group_name) values (?)", [group])
-        # cur.executemany("insert into Groups(group_name) values (?)", groups) #todo НЕ РАБОТЕТ
-        # self.con.commit()
-        cur.execute("select * from Groups")
-        # print(cur.fetchall())
         self.con.commit()
 
     def insert_subject(self, day: str, subject: Subject):
         cur = self.cur
         cur.execute("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day), subject.ready_to_insert_data)
         cur.execute("select * from {}".format(day))
-        all_result = cur.fetchall()
-        # print(all_result)
 
     def insert_subjects(self, day: str, subjects: [Subject]):
         cur = self.cur
@@ -47,8 +40,6 @@ class Schedule:
         cur.executemany("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day),
                         data)
         cur.execute("select * from {}".format(day))
-        all_result = cur.fetchall()
-        # print(all_result)
         self.con.commit()
 
     def insert_user(self, user: User):
@@ -57,17 +48,105 @@ class Schedule:
         group_id = cur.fetchone()
         cur.execute("insert into Users(telegram_id, vk_id, Name, Surname, group_id)  values (?, ?, ?, ?, ?)",
                     user.ready_to_insert_data + list(group_id))
-        cur.execute("select * from Users")
-        print(cur.fetchall())
+        self.con.commit()
 
-    def select_day_by_user(self, day: str, user: User):
+    def drop_tables(self):
         cur = self.cur
-        cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
-        group_id = int(str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', ''))
-        week = weeknum()
+        cur.execute("""
+                drop table Monday ;
+        CREATE TABLE Monday (
+            "group_id"	INTEGER NOT NULL,
+            "number"	INTEGER,
+            "even"	INTEGER NOT NULL,
+            "weeks"	TEXT NOT NULL,
+            "Subject"	TEXT NOT NULL,
+            "Instructor"	TEXT,
+            "Type"	TEXT NOT NULL,
+            "Class"	TEXT,
+            "Link"	TEXT
+        );
+        drop table Friday ;
+        CREATE TABLE Friday (
+            "group_id"	INTEGER NOT NULL,
+            "number"	INTEGER,
+            "even"	INTEGER NOT NULL,
+            "weeks"	TEXT NOT NULL,
+            "Subject"	TEXT NOT NULL,
+            "Instructor"	TEXT,
+            "Type"	TEXT NOT NULL,
+            "Class"	TEXT,
+            "Link"	TEXT
+        );
+        drop table Tuesday ;
+        CREATE TABLE Tuesday (
+            "group_id"	INTEGER NOT NULL,
+            "number"	INTEGER,
+            "even"	INTEGER NOT NULL,
+            "weeks"	TEXT NOT NULL,
+            "Subject"	TEXT NOT NULL,
+            "Instructor"	TEXT,
+            "Type"	TEXT NOT NULL,
+            "Class"	TEXT,
+            "Link"	TEXT
+        );
+        drop table Thursday ;
+        CREATE TABLE Thursday (
+            "group_id"	INTEGER NOT NULL,
+            "number"	INTEGER,
+            "even"	INTEGER NOT NULL,
+            "weeks"	TEXT NOT NULL,
+            "Subject"	TEXT NOT NULL,
+            "Instructor"	TEXT,
+            "Type"	TEXT NOT NULL,
+            "Class"	TEXT,
+            "Link"	TEXT
+        );
+        drop table Saturday ;
+        CREATE TABLE Saturday (
+            "group_id"	INTEGER NOT NULL,
+            "number"	INTEGER,
+            "even"	INTEGER NOT NULL,
+            "weeks"	TEXT NOT NULL,
+            "Subject"	TEXT NOT NULL,
+            "Instructor"	TEXT,
+            "Type"	TEXT NOT NULL,
+            "Class"	TEXT,
+            "Link"	TEXT
+        );
+        drop table Wednesday ;
+        CREATE TABLE Wednesday (
+            "group_id"	INTEGER NOT NULL,
+            "number"	INTEGER,
+            "even"	INTEGER NOT NULL,
+            "weeks"	TEXT NOT NULL,
+            "Subject"	TEXT NOT NULL,
+            "Instructor"	TEXT,
+            "Type"	TEXT NOT NULL,
+            "Class"	TEXT,
+            "Link"	TEXT
+        );""")
+        self.con.commit()
+
+    def select_user(self, telegram_id='', vk_id=''):
+        cur = self.cur
+        cur.execute("""select * from Users
+        where telegram_id == (?)
+        and vk_id == (?)""", [telegram_id, vk_id])
+        res = cur.fetchone()
+        res = list(map(str, res))
+        user = User(res[3], res[4], res[1], res[2], res[5])
+        return user
+
+    def select_day_by_user(self, day: str, user: User, week=weeknum()):
+        cur = self.cur
+        if user.group_id == '':
+            cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
+            group_id = int(str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', ''))
+        else:
+            group_id = user.group_id
         vars = [f'{week} %', f'% {week}', f'% {week} %']
         cur.execute(
-            """select G.group_name, D.number, D.even, D.weeks, D.Subject, D.Instructor, D.Type, D.Class, D.Link 
+            """select D.number, D.weeks, D.Subject, D.Instructor, D.Type, D.Class, D.Link 
             from {day} D 
             left join Groups G on D.group_id = G.group_id
             where D.group_id = (?)
@@ -76,10 +155,13 @@ class Schedule:
             or D.weeks like '{var3}')
             order by D.number""".format(
                 day=day, var1=vars[0], var2=vars[1], var3=vars[2]), [group_id])
-        print(cur.fetchall())
+        res = cur.fetchall()
+        return res
 
-# user = User('a','b', '123', '234', 'БЭСО-03-19')
-# schedule = Schedule()
-# schedule.select_day_by_user('Monday', user)
-# schedule.select_day_by_user('Tuesday', user)
-# schedule.select_day_by_user('Friday', user)
+    def select_group_name(self, group_id: int):
+        cur = self.cur
+        cur.execute("""
+        select group_name from Groups
+        where group_id == (?)""", [group_id])
+        res = str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', '').replace('\'', '')
+        return res

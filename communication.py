@@ -1,7 +1,8 @@
 # todo Функции, которые будут возвращать готовый к отправке пользователю string
 import calendar
-from datetime import date
+from datetime import date, timedelta
 
+from UserClass import User
 from settings import schedule, weekdays_en
 from utils import *
 
@@ -33,5 +34,32 @@ def user_schedule_on_week(telegram_id='', vk_id='', week=weeknum()):
     return res
 
 
+def today_schedule(telegram_id='', vk_id=''):
+    return user_schedule_on_day(telegram_id, vk_id)
+
+
+def nextday_schedule(telegram_id='', vk_id=''):
+    return user_schedule_on_day(telegram_id, vk_id, day=date.today() + timedelta(days=1))
+
+
+def current_week_schedule(telegram_id='', vk_id=''):
+    return user_schedule_on_week(telegram_id, vk_id)
+
+
+def next_week_schedule(telegram_id='', vk_id=''):
+    return user_schedule_on_week(telegram_id, vk_id, weeknum() + 1)
+
+
 def get_current_weeknum():
     return f'Текущая неделя - {weeknum()}'
+
+
+def insert_user(user: User):
+    if schedule.check_group(user.group_name) is not None:
+        exists = schedule.select_user(user.telegram_id, user.vk_id) is not None
+        if not exists:
+            schedule.insert_user(user)
+        else:
+            schedule.update_user(user)
+    else:
+        raise IndexError("Ошибка. Такой группы нет в базе")

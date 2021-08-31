@@ -50,6 +50,18 @@ class Schedule:
                     user.ready_to_insert_data + list(group_id))
         self.con.commit()
 
+    def update_user(self, user: User):
+        cur = self.cur
+        cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
+        group_id = cur.fetchone()
+        cur.execute("""UPDATE Users
+        set group_id = (?),
+            Name = (?),
+            Surname = (?)
+        where telegram_id = (?)
+        and vk_id = (?);""", [group_id, user.name, user.surname, user.telegram_id, user.vk_id])
+        self.con.commit()
+
     def drop_tables(self):
         cur = self.cur
         cur.execute("""
@@ -133,9 +145,11 @@ class Schedule:
         where telegram_id == (?)
         and vk_id == (?)""", [telegram_id, vk_id])
         res = cur.fetchone()
-        res = list(map(str, res))
-        user = User(res[3], res[4], res[1], res[2], res[5])
-        return user
+        if res is not None:
+            res = list(map(str, res))
+            user = User(res[3], res[4], res[1], res[2], res[5])
+            return user
+        return None
 
     def select_day_by_user(self, day: str, user: User, week=weeknum()):
         cur = self.cur
@@ -166,3 +180,24 @@ class Schedule:
         res = str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', '').replace('\'', '')
         return res
 
+    def drop_users(self):
+        cur = self.cur
+        cur.execute("drop table if exists Users;")
+        cur.execute("""
+                create table Users
+        (
+            user_id     INTEGER
+                primary key autoincrement
+                unique,
+            telegram_id INTEGER,
+            vk_id       INTEGER,
+            Name        TEXT,
+            Surname     TEXT,
+            group_id    INTEGER not null
+        );""")
+        self.con.commit()
+
+    def check_group(self, group_name):
+        self.cur.execute("select group_id from Groups where group_name == (?)", [group_name])
+        res = self.cur.fetchone()
+        return res

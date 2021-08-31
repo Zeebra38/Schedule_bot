@@ -57,6 +57,3 @@ async def collect_trash(message: types.Message):
 
 def telegram_polling():
     executor.start_polling(dp, skip_updates=True)
-
-
-telegram_polling()

@@ -42,3 +42,4 @@ def download_schedules():
     for link in links:
         threading.Thread(target=download, args=[link, barrier]).start()
     barrier.wait()
+

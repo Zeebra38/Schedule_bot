@@ -1,6 +1,6 @@
 from DataBase import Schedule
 
-schedule = Schedule()
+
 weekdays_en = {'Monday': 'Понедельник',
                'Tuesday': 'Вторник',
                'Wednesday': 'Среда',

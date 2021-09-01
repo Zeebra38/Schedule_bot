@@ -183,5 +183,5 @@ def SchedulePars():
     for key, value in subjects_grouped_by_weekday.items():
         schedule.insert_subjects(key, value)
     schedule.con.close()
-SchedulePars()
+# SchedulePars()
 # schedule.insert_groups(GroupsList())

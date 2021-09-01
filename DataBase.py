@@ -4,7 +4,6 @@ from SubjestClass import Subject
 from UserClass import User
 from utils import weeknum
 
-
 class Schedule:
 
     def __init__(self, path='private/rasp.db'):
@@ -64,79 +63,19 @@ class Schedule:
 
     def drop_tables(self):
         cur = self.cur
-        cur.execute("""
-                drop table Monday ;
-        CREATE TABLE Monday (
-            "group_id"	INTEGER NOT NULL,
-            "number"	INTEGER,
-            "even"	INTEGER NOT NULL,
-            "weeks"	TEXT NOT NULL,
-            "Subject"	TEXT NOT NULL,
-            "Instructor"	TEXT,
-            "Type"	TEXT NOT NULL,
-            "Class"	TEXT,
-            "Link"	TEXT
-        );
-        drop table Friday ;
-        CREATE TABLE Friday (
-            "group_id"	INTEGER NOT NULL,
-            "number"	INTEGER,
-            "even"	INTEGER NOT NULL,
-            "weeks"	TEXT NOT NULL,
-            "Subject"	TEXT NOT NULL,
-            "Instructor"	TEXT,
-            "Type"	TEXT NOT NULL,
-            "Class"	TEXT,
-            "Link"	TEXT
-        );
-        drop table Tuesday ;
-        CREATE TABLE Tuesday (
-            "group_id"	INTEGER NOT NULL,
-            "number"	INTEGER,
-            "even"	INTEGER NOT NULL,
-            "weeks"	TEXT NOT NULL,
-            "Subject"	TEXT NOT NULL,
-            "Instructor"	TEXT,
-            "Type"	TEXT NOT NULL,
-            "Class"	TEXT,
-            "Link"	TEXT
-        );
-        drop table Thursday ;
-        CREATE TABLE Thursday (
-            "group_id"	INTEGER NOT NULL,
-            "number"	INTEGER,
-            "even"	INTEGER NOT NULL,
-            "weeks"	TEXT NOT NULL,
-            "Subject"	TEXT NOT NULL,
-            "Instructor"	TEXT,
-            "Type"	TEXT NOT NULL,
-            "Class"	TEXT,
-            "Link"	TEXT
-        );
-        drop table Saturday ;
-        CREATE TABLE Saturday (
-            "group_id"	INTEGER NOT NULL,
-            "number"	INTEGER,
-            "even"	INTEGER NOT NULL,
-            "weeks"	TEXT NOT NULL,
-            "Subject"	TEXT NOT NULL,
-            "Instructor"	TEXT,
-            "Type"	TEXT NOT NULL,
-            "Class"	TEXT,
-            "Link"	TEXT
-        );
-        drop table Wednesday ;
-        CREATE TABLE Wednesday (
-            "group_id"	INTEGER NOT NULL,
-            "number"	INTEGER,
-            "even"	INTEGER NOT NULL,
-            "weeks"	TEXT NOT NULL,
-            "Subject"	TEXT NOT NULL,
-            "Instructor"	TEXT,
-            "Type"	TEXT NOT NULL,
-            "Class"	TEXT,
-            "Link"	TEXT
-        );""")
+        for day in 'Monday Tuesday Friday Thursday Saturday Wednesday'.split():
+            cur.execute("drop table if exists {};".format(day))
+            cur.execute("""CREATE TABLE {} (
+                "group_id"	INTEGER NOT NULL,
+                "number"	INTEGER,
+                "even"	INTEGER NOT NULL,
+                "weeks"	TEXT NOT NULL,
+                "Subject"	TEXT NOT NULL,
+                "Instructor"	TEXT,
+                "Type"	TEXT NOT NULL,
+                "Class"	TEXT,
+                "Link"	TEXT
+            ); """.format(day), [day])
         self.con.commit()
 
     def select_user(self, telegram_id='', vk_id=''):
@@ -160,7 +99,7 @@ class Schedule:
             group_id = user.group_id
         vars = [f'{week} %', f'% {week}', f'% {week} %']
         cur.execute(
-            """select D.number, D.weeks, D.Subject, D.Instructor, D.Type, D.Class, D.Link 
+            """select D.number, D.weeks, D.Subject, D.Instructor, D.Type, D.Class
             from {day} D 
             left join Groups G on D.group_id = G.group_id
             where D.group_id = (?)

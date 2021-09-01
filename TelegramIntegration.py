@@ -1,59 +1,84 @@
-from aiogram import Bot, Dispatcher, executor, types
-
+from telebot import TeleBot, types
 from UserClass import User
 from communication import insert_user, today_schedule, nextday_schedule, next_week_schedule, current_week_schedule, \
-    get_current_weeknum
+    get_current_weeknum, update_schedule
 from private.config import API_TOKEN
 
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+bot = TeleBot(API_TOKEN)
 
 
-@dp.message_handler(commands=['start'])
-async def send_welcome(message: types.Message):
-    await message.reply('Hello {}'.format(message.from_user.username))
+@bot.message_handler(commands=['start'])
+def send_welcome(message: types.Message):
+    bot.send_message(message.chat.id, 'Hello {}'.format(message.from_user.username))
 
 
-@dp.message_handler(regexp=r"^(?ui)[а-я]{4}-\d{2}-\d{2}$")
-async def setup_user(message: types.Message):
+@bot.message_handler(commands=['help'])
+def send_help(message: types.Message):
+    bot.send_message(message.chat.id,
+                     'Напиши /today чтобы увидеть расписание на сегодня или /nextday - для завтрашнего дня. '
+                     'Напиши /week чтобы увидеть расписание на текущую неделю или /nextweek для следующей. Чтобы '
+                     'изменить текущую '
+                     'группу введите ее название. '
+                     'Чтобы узнать номер текущей недели введите /weeknumber')
+
+
+@bot.message_handler(regexp=r"^(?ui)[а-я]{4}-\d{2}-\d{2}$")
+def setup_user(message: types.Message):
     from_user = message.from_user
     user = User(from_user.first_name, from_user.last_name, from_user.id, group_name=message.text.upper())
     try:
         insert_user(user)
-        await message.answer(f'Вы зарегистрированы как {message.text.upper()}')
+        bot.send_message(message.chat.id, f'Вы зарегистрированы как {message.text.upper()}')
     except IndexError as e:
-        await message.answer(str(e))
+        bot.send_message(message.chat.id, str(e))
 
 
-@dp.message_handler(commands=['today'])
-async def today(message: types.Message):
-    await message.answer(today_schedule(message.from_user.id))
+@bot.message_handler(commands=['today'])
+def today(message: types.Message):
+    try:
+        bot.send_message(message.chat.id, today_schedule(message.from_user.id))
+    except KeyError as e:
+        bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
 
-@dp.message_handler(commands=['nextday'])
-async def today(message: types.Message):
-    await message.answer(nextday_schedule(message.from_user.id))
+@bot.message_handler(commands=['nextday'])
+def today(message: types.Message):
+    try:
+        bot.send_message(message.chat.id, nextday_schedule(message.from_user.id))
+    except KeyError as e:
+        bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
 
-@dp.message_handler(commands=['week'])
-async def current_week(message: types.Message):
-    await message.answer(current_week_schedule(message.from_user.id))
+@bot.message_handler(commands=['week'])
+def current_week(message: types.Message):
+    try:
+        bot.send_message(message.chat.id, current_week_schedule(message.from_user.id))
+    except KeyError as e:
+        bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
 
-@dp.message_handler(commands=['nextweek'])
-async def next_week(message: types.Message):
-    await message.answer(next_week_schedule(message.from_user.id))
+@bot.message_handler(commands=['nextweek'])
+def next_week(message: types.Message):
+    try:
+        bot.send_message(message.chat.id, next_week_schedule(message.from_user.id))
+    except KeyError as e:
+        bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
 
-@dp.message_handler(commands=['weeknumber'])
-async def get_weeknum(message: types.Message):
-    await message.answer(get_current_weeknum())
+@bot.message_handler(commands=['weeknumber'])
+def get_weeknum(message: types.Message):
+    bot.send_message(message.chat.id, get_current_weeknum())
 
 
-@dp.message_handler()
-async def collect_trash(message: types.Message):
-    await message.reply('Неверная команда. Введите /help чтобы увидеть список всех доступных команд')
+@bot.message_handler(commands=['update'])
+def schedudle_update(message: types.Message):
+    bot.send_message(message.chat.id, update_schedule())
+
+
+@bot.message_handler()
+def collect_trash(message: types.Message):
+    bot.send_message(message.chat.id, 'Неверная команда. Введите /help чтобы увидеть список всех доступных команд')
 
 
 def telegram_polling():
-    executor.start_polling(dp, skip_updates=True)
+    bot.infinity_polling()

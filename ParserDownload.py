@@ -27,7 +27,7 @@ def find_links():
     links = []
     for a in all_a:
         if 'webservices' in a['href'] and '.xlsx' in a['href'] and (
-                'КБиСП' in a['href'] or 'Киб' in a['href']):  # убрать потом конкретные институты
+                'КБиСП' in a['href'] or 'Киб' in a['href'] or 'ИИТ' in a['href']):  # убрать потом конкретные институты
             links.append(a['href'])
     return links
 

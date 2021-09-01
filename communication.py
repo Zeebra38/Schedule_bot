@@ -1,14 +1,20 @@
 # todo Функции, которые будут возвращать готовый к отправке пользователю string
 import calendar
 from datetime import date, timedelta
-from DataBase import Schedule
 from UserClass import User
 from settings import weekdays_en
 from utils import *
+from DataBase import Schedule
+from ParserDownload import download_schedules
+from ParserTable import SchedulePars
 
 
-def user_schedule_on_day(telegram_id='', vk_id='', week=weeknum(), day=date.today(), weekday=''):
+def user_schedule_on_day(telegram_id='', vk_id='', week=None, day=None, weekday=''):
     schedule = Schedule()
+    if week is None:
+        week = weeknum()
+    if day is None:
+        day = date.today()
     if schedule.select_user(telegram_id, vk_id) is None:
         raise KeyError("Пользователь не зарегистрирован")
     user = schedule.select_user(telegram_id=telegram_id, vk_id=vk_id)
@@ -17,7 +23,7 @@ def user_schedule_on_day(telegram_id='', vk_id='', week=weeknum(), day=date.toda
     else:
         day = weekday
     select_res = schedule.select_day_by_user(day, user, week)
-    res = f'Группа - {schedule.select_group_name(user.group_id)} {weekdays_en[day]} {week} неделя:\n'
+    res = f'{schedule.select_group_name(user.group_id)} {weekdays_en[day]} {week} неделя:\n'
     for subj in select_res:
         subj = list(subj)
         subj[0] = f'{subj[0]} {get_subj_time(int(subj[0]))}'
@@ -30,8 +36,10 @@ def user_schedule_on_day(telegram_id='', vk_id='', week=weeknum(), day=date.toda
     return res
 
 
-def user_schedule_on_week(telegram_id='', vk_id='', week=weeknum()):
+def user_schedule_on_week(telegram_id='', vk_id='', week=None):
     schedule = Schedule()
+    if week is None:
+        week = weeknum()
     if schedule.select_user(telegram_id, vk_id) is None:
         raise KeyError("Пользователь не зарегистрирован")
     days = list(calendar.day_name)[:-1]
@@ -74,3 +82,14 @@ def insert_user(user: User):
     else:
         schedule.con.close()
         raise IndexError("Ошибка. Такой группы нет в базе")
+
+
+def update_schedule():
+    try:
+        schedule = Schedule()
+        schedule.drop_tables()
+        download_schedules()
+        SchedulePars()
+    except Exception as e:
+        return str(e)
+    return 'Updated successfully'

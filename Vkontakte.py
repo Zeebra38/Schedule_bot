@@ -61,11 +61,11 @@ def thread_ls():
         # x.start()
 
 
-
-x1 = threading.Thread(target=thread_ls)
-x2 = threading.Thread(target=thread_gr)
-x1.start()
-x2.start()
+def vk_polling():
+    x1 = threading.Thread(target=thread_ls)
+    x2 = threading.Thread(target=thread_gr)
+    x1.start()
+    x2.start()
 
 """ 
 1. Сделать вывод расписания на сегодня - завтра

@@ -52,7 +52,7 @@ class Schedule:
     def update_user(self, user: User):
         cur = self.cur
         cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
-        group_id = cur.fetchone()
+        group_id = int(str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', ''))
         cur.execute("""UPDATE Users
         set group_id = (?),
             Name = (?),

@@ -10,7 +10,7 @@ def translate_weekday(weekday: str):
 
 
 def weeknum():
-    zero = datetime(2021, 9, 1)
+    zero = datetime(2021, 8, 30)
     now = datetime.today()
     # now = datetime(2021, 2, 8) #расскоментить для изменения даты
     delta = now - zero

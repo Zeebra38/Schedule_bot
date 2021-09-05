@@ -55,7 +55,10 @@ def today_schedule(telegram_id='', vk_id=''):
 
 
 def nextday_schedule(telegram_id='', vk_id=''):
-    return user_schedule_on_day(telegram_id, vk_id, day=date.today() + timedelta(days=1))
+    week = weeknum()
+    if calendar.day_name[date.today().weekday()] == 'Sunday':
+        week += 1
+    return user_schedule_on_day(telegram_id, vk_id, day=date.today() + timedelta(days=1), week=week)
 
 
 def current_week_schedule(telegram_id='', vk_id=''):

@@ -68,9 +68,9 @@ def Parser_Table(name_table):
                         subjets.clear()
                         DenNedeli += 12
 
-                    if item.value != None and "\n" in item.value:
+                    if item.value != None and "\n" in item.value and item.value.strip() != 'Военная\nподготовка':
                         try:
-                            ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value,
+                            ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value.strip(),
                                                        vid_zanyatiy.value,
                                                        FIO.value, nomer.value, ssilka.value)
                         except Exception as e:
@@ -81,7 +81,7 @@ def Parser_Table(name_table):
                         # schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), ForMultiSubject.subjects)#инглишменский день
 
                     elif item.value != None:
-                        ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value,
+                        ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value.strip().replace('\n', ' '),
                                              vid_zanyatiy.value,
                                              FIO.value, nomer.value, ssilka.value)
                         global subjects
@@ -148,6 +148,7 @@ def Groups_List(name_table, barrier):
 
 def SchedulePars():
     schedule = Schedule()
+    schedule.drop_tables()
     #schedule.drop_tables()
     os.chdir('./schedules')  # переход на работу с другой директорией
     # print(os.listdir()) # весь список всего

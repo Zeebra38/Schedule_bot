@@ -32,6 +32,9 @@ def user_schedule_on_day(telegram_id='', vk_id='', week=None, day=None, weekday=
         res += ' '.join(new_subj) + '\n'
     if len(select_res) == 0:
         res += 'Сегодня пар нет\n'
+    if len(select_res) == 1 and 'Военная подготовка' in res:
+        res = f'{schedule.select_group_name(user.group_id)} {weekdays_en[day]} {week} неделя:\n'
+        res += 'Военная подготовка\n'
     schedule.con.close()
     return res
 

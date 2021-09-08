@@ -65,7 +65,8 @@ class MultiSubject:
                 for _ in range(len(b) - len(a)):
                     a.append(a[0])
             return a
-
+        if _class is None:
+            _class = ''
         _class = str(_class)
         if link is None:
             link = ''

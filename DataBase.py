@@ -75,7 +75,7 @@ class Schedule:
                 "Type"	TEXT NOT NULL,
                 "Class"	TEXT,
                 "Link"	TEXT
-            ); """.format(day), [day])
+            ); """.format(day))
         self.con.commit()
 
     def select_user(self, telegram_id='', vk_id=''):

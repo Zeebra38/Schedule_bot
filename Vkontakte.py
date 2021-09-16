@@ -7,10 +7,10 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.longpoll import VkLongPoll, VkEventType
 from VKUtils import vk_raspisanie, send
 from private.config import vk_session
-
+from communication import update_schedule
 def thread_gr():
     try:
-        print(time)
+
         longpoll = VkBotLongPoll(vk_session, 186219261)
         for event in longpoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:  # проверка нового сообщения
@@ -24,8 +24,15 @@ def thread_gr():
         with open('logs.txt', 'a', encoding='utf-8') as f:
             f.write(f'{datetime.now()} {rrr} group continue \n')
         try:
-            send(68659003, f'{datetime.now()}  \n  {rrr} group', 2, 1)          #ЛС Мише Р.
-            send(152014637, f'{datetime.now()}  \n  {rrr} group continue', 2, 1)#ЛС Илье Д.
+            now = datetime.now()
+            if now.hour in [1, 2, 3]:
+                update_schedule()
+
+            else:
+
+                send(68659003, f'{datetime.now()}  \n  {rrr} group', 2, 1)          #ЛС Мише Р.
+                send(152014637, f'{datetime.now()}  \n  {rrr} group continue', 2, 1)#ЛС Илье Д.
+
             t1.sleep(1800)
         except Exception as err:
             with open('logs1.txt', 'a', encoding='utf-8') as f:
@@ -36,7 +43,7 @@ def thread_gr():
 
 def thread_ls():
     try:
-        print(t1.time())
+
         lslongpoll = VkLongPoll(vk_session)
         for event in lslongpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW:  # проверка нового сообщения
@@ -52,8 +59,13 @@ def thread_ls():
         with open('logs.txt', 'a', encoding='utf-8') as f:
             f.write(f'{datetime.now()} {rrr} ls pass\n')
         try:
-            send(68659003, f'{datetime.now()}  \n  {rrr} ls', 2, 1)
-            send(152014637, f'{datetime.now()}  \n  {rrr} ls pass', 2, 1)
+            now = datetime.now()
+            if now.hour in [1, 2, 3]:
+                pass
+            else:
+                send(68659003, f'{datetime.now()}  \n  {rrr} group', 2, 1)  # ЛС Мише Р.
+                send(152014637, f'{datetime.now()}  \n  {rrr} group continue', 2, 1)  # ЛС Илье Д.
+
             t1.sleep(1800)
         except Exception as rrr:
             with open('logs1.txt', 'a', encoding='utf-8') as f:

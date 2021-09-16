@@ -4,6 +4,7 @@ from communication import insert_user, today_schedule, nextday_schedule, next_we
     get_current_weeknum, update_schedule, specify_week_schedule
 from private.config import API_TOKEN
 import threading
+
 bot = TeleBot(API_TOKEN)
 
 
@@ -64,6 +65,7 @@ def next_week(message: types.Message):
     except KeyError as e:
         bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
+
 @bot.message_handler(commands=['specialweek'])
 def special_week(message: types.Message):
     try:
@@ -88,7 +90,10 @@ def get_weeknum(message: types.Message):
 @bot.message_handler(commands=['update'])
 def schedudle_update(message: types.Message):
     def schedule_updater():
-        bot.send_message(message.chat.id, update_schedule())
+        response = update_schedule()
+        bot.send_message(384513642, response)
+        bot.send_message(526752662, response)
+
     update_thread = threading.Thread(target=schedule_updater)
     update_thread.start()
 

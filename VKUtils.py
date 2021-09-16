@@ -2,7 +2,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from private.config import vk_session
 from vk_api.utils import get_random_id
 from communication import insert_user, today_schedule, nextday_schedule, next_week_schedule, current_week_schedule, \
-    get_current_weeknum
+    get_current_weeknum, specify_week_schedule
 from UserClass import User
 
 vk = vk_session.get_api()
@@ -132,22 +132,6 @@ def send(id, text, peremennaya, ls: int, msg_id=0):
         )
 
 
-"""
-    else:
-        if peremennaya == 1:
-            vk_session.method('messages.send',
-                          {'chat_id': id, 'message': text, 'random_id': 0, 'keyboard': keyboard.get_keyboard()})
-        elif peremennaya == 2:
-            vk_session.method('messages.send', {'chat_id': id, 'message': text, 'random_id': 0, #отправление сообщений в лс
-                                            'keyboard': keyboard_admin.get_keyboard()})  # отправление сообщений
-        elif peremennaya == 3:
-            vk_session.method('messages.send', {'chat_id': id, 'message': text, 'random_id': 0,
-                                            'keyboard': keyboard_infinity.get_keyboard()})  # отправление сообщений с бесконечной клавой
-        else:
-            vk_session.method('messages.send',
-                          {'chat_id': id, 'message': text, 'random_id': 0})"""
-
-
 def vk_raspisanie(id: int, msg: str, ls: int):
 
     if '-' in msg[4:5] and '-' in msg[7:8] and len(msg) == 10: #Регистрация группы todo first name last name
@@ -157,6 +141,34 @@ def vk_raspisanie(id: int, msg: str, ls: int):
             send(id, 'Вы зарегистрированы как {}'.format(msg), 0, ls)
         except IndexError as e:
             send(id, str(e), 0, ls)
+
+
+
+    if "неделя" in msg:
+
+        try:
+            week = int(msg.split()[1])
+            if 0 < week < 17:
+                send(id, specify_week_schedule(vk_id = id, week = week), 0, ls)
+            else:
+                send(id, f'{week} - недопустимый номер недели', 0, ls)
+        except ValueError:
+            send(id, 'Ошибка. Вы ввели не число', 0, ls)
+
+        except IndexError:
+            send(id, 'Ошибка. Необходим аргумент - число', 0, ls)
+
+        except Exception as e:
+            send(id, str(e), 0, ls)
+
+    if "номер недели" in msg:
+
+        try:
+
+            send(id, get_current_weeknum(), 0, ls)
+        except IndexError as e:
+            send(id, str(e), 0, ls)
+
 
     if 'расписание на сегодня' in msg:
 

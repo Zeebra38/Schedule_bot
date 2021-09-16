@@ -107,9 +107,6 @@ def update_schedule():
         SchedulePars()
         os.remove(original)
         os.rename(target, original)
-        if os.path.exists('schedules'):
-            path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'schedules')
-            shutil.rmtree(path)
         time.sleep(2)
     except Exception as e:
         return str(e)

@@ -70,18 +70,20 @@ def Parser_Table(name_table):
 
                     if item.value != None and "\n" in item.value and item.value.strip() != 'Военная\nподготовка':
                         try:
-                            ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value.strip(),
-                                                       vid_zanyatiy.value,
-                                                       FIO.value, nomer.value, ssilka.value)
+                            ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2,
+                                                           item.value.strip(),
+                                                           vid_zanyatiy.value,
+                                                           FIO.value, nomer.value, ssilka.value)
                         except Exception as e:
                             print(str(e))
-                            a = 1/(1-1)
+                            a = 1 / (1 - 1)
                         global multisubjects
                         multisubjects[ForMultiSubject] = translate_weekday(sheet[DenNedeli][0].value)
                         # schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), ForMultiSubject.subjects)#инглишменский день
 
                     elif item.value != None:
-                        ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2, item.value.strip().replace('\n', ' '),
+                        ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2,
+                                             item.value.strip().replace('\n', ' '),
                                              vid_zanyatiy.value,
                                              FIO.value, nomer.value, ssilka.value)
                         global subjects
@@ -96,14 +98,16 @@ def Parser_Table(name_table):
         row_min_min = int(row_min_min)
 
         column_min = column_min + 1
-    print(time()-start, name_table)
+    print(time() - start, name_table)
+    wb.close()
+    table.close()
     # print(sheet[5][0].value) #row_min_min -1
-    #barrier.wait()
+    # barrier.wait()
     # return ForMultiSubject
 
 
 def Groups_List(name_table, barrier):
-   # name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
+    # name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
 
     table = openpyxl.open(name_table, read_only=True)
 
@@ -133,9 +137,9 @@ def Groups_List(name_table, barrier):
         # print(data_from_cell)
         if len(data_from_cell) > 9:
             if data_from_cell[4] == '-' and data_from_cell[7] == '-' and data_from_cell[:10] not in GroupList:
-                #print('Нашли в ячейке:', column_min, " ", row_min_min)
-                #print(data_from_cell)
-                #print(sheet[2][int(column_min) - 1].value[0:10])
+                # print('Нашли в ячейке:', column_min, " ", row_min_min)
+                # print(data_from_cell)
+                # print(sheet[2][int(column_min) - 1].value[0:10])
 
                 GroupList.append(data_from_cell[0:10])
         row_min_min = int(row_min_min)
@@ -143,6 +147,8 @@ def Groups_List(name_table, barrier):
         column_min = column_min + 1
     # print(GroupList)
     # return GroupList
+    wb.close()
+    table.close()
     barrier.wait()
 
 
@@ -170,11 +176,9 @@ def SchedulePars():
     global subjects, multisubjects
     subjects.clear()
     multisubjects.clear()
-    #barrier = Barrier(len(os.listdir()) + 1)
+    # barrier = Barrier(len(os.listdir()) + 1)
     for NameTable1 in dirlist:  # цикл для работы с списком всего
         Parser_Table(NameTable1)
-
-
 
     print(time() - start)
     for key, value in multisubjects.items():

@@ -1,4 +1,3 @@
-# todo Функции, которые будут возвращать готовый к отправке пользователю string
 import calendar
 from datetime import date, timedelta
 from UserClass import User
@@ -66,6 +65,10 @@ def nextday_schedule(telegram_id='', vk_id=''):
 
 def current_week_schedule(telegram_id='', vk_id=''):
     return user_schedule_on_week(telegram_id, vk_id)
+
+
+def specify_week_schedule(telegram_id='', vk_id='', week=1):
+    return user_schedule_on_week(telegram_id, vk_id, week)
 
 
 def next_week_schedule(telegram_id='', vk_id=''):

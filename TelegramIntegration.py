@@ -1,7 +1,7 @@
 from telebot import TeleBot, types
 from UserClass import User
 from communication import insert_user, today_schedule, nextday_schedule, next_week_schedule, current_week_schedule, \
-    get_current_weeknum, update_schedule
+    get_current_weeknum, update_schedule, specify_week_schedule
 from private.config import API_TOKEN
 
 bot = TeleBot(API_TOKEN)
@@ -63,6 +63,21 @@ def next_week(message: types.Message):
         bot.send_message(message.chat.id, next_week_schedule(message.from_user.id))
     except KeyError as e:
         bot.send_message(message.chat.id, 'Вы не зарегистрированы')
+
+@bot.message_handler(commands=['specialweek'])
+def special_week(message: types.Message):
+    try:
+        week = int(message.text.split()[1])
+        if 0 < week < 17:
+            bot.send_message(message.chat.id, specify_week_schedule(message.from_user.id, week=week))
+        else:
+            bot.send_message(message.chat.id, f'{week} - недопустимый номер недели')
+    except ValueError:
+        bot.send_message(message.chat.id, 'Ошибка. Вы ввели не число')
+    except IndexError:
+        bot.send_message(message.chat.id, 'Ошибка. Необходим аргумент - число')
+    except Exception as e:
+        bot.send_message(message.chat.id, str(e))
 
 
 @bot.message_handler(commands=['weeknumber'])

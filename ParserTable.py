@@ -149,7 +149,6 @@ def Groups_List(name_table, barrier):
 def SchedulePars():
     schedule = Schedule()
     schedule.drop_tables()
-    #schedule.drop_tables()
     os.chdir('./schedules')  # переход на работу с другой директорией
     # print(os.listdir()) # весь список всего
     global GroupList

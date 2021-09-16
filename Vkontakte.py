@@ -10,6 +10,7 @@ from private.config import vk_session
 
 def thread_gr():
     try:
+        print(time)
         longpoll = VkBotLongPoll(vk_session, 186219261)
         for event in longpoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:  # проверка нового сообщения
@@ -35,6 +36,7 @@ def thread_gr():
 
 def thread_ls():
     try:
+        print(t1.time())
         lslongpoll = VkLongPoll(vk_session)
         for event in lslongpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW:  # проверка нового сообщения

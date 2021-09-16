@@ -1,4 +1,5 @@
 import calendar
+import time
 from datetime import date, timedelta
 from UserClass import User
 from settings import weekdays_en
@@ -6,6 +7,9 @@ from utils import *
 from DataBase import Schedule
 from ParserDownload import download_schedules
 from ParserTable import SchedulePars
+import shutil
+import os
+from pathlib import Path
 
 
 def user_schedule_on_day(telegram_id='', vk_id='', week=None, day=None, weekday=''):
@@ -95,10 +99,18 @@ def insert_user(user: User):
 
 def update_schedule():
     try:
-        schedule = Schedule()
-        schedule.drop_tables()
+        path = str(Path(__file__).parent.absolute())
+        original = path + '/private/rasp.db'
+        target = path + '/private/rasp1.db'
+        shutil.copyfile(original, target)
         download_schedules()
         SchedulePars()
+        os.remove(original)
+        os.rename(target, original)
+        if os.path.exists('schedules'):
+            path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'schedules')
+            shutil.rmtree(path)
+        time.sleep(2)
     except Exception as e:
         return str(e)
     return 'Updated successfully'

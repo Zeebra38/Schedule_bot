@@ -3,7 +3,7 @@ from UserClass import User
 from communication import insert_user, today_schedule, nextday_schedule, next_week_schedule, current_week_schedule, \
     get_current_weeknum, update_schedule, specify_week_schedule
 from private.config import API_TOKEN
-
+import threading
 bot = TeleBot(API_TOKEN)
 
 
@@ -87,7 +87,10 @@ def get_weeknum(message: types.Message):
 
 @bot.message_handler(commands=['update'])
 def schedudle_update(message: types.Message):
-    bot.send_message(message.chat.id, update_schedule())
+    def schedule_updater():
+        bot.send_message(message.chat.id, update_schedule())
+    update_thread = threading.Thread(target=schedule_updater)
+    update_thread.start()
 
 
 @bot.message_handler()

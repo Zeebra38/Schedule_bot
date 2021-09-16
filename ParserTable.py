@@ -147,15 +147,17 @@ def Groups_List(name_table, barrier):
 
 
 def SchedulePars():
-    schedule = Schedule()
+    schedule = Schedule(path='private/rasp1.db')
     schedule.drop_tables()
     os.chdir('./schedules')  # переход на работу с другой директорией
     # print(os.listdir()) # весь список всего
+    dirlist = ['./schedules/' + el for el in os.listdir()]
+    os.chdir('../')
     global GroupList
     GroupList = []
-    barrier = Barrier(len(os.listdir()) + 1)
+    barrier = Barrier(len(dirlist) + 1)
     start = time()
-    for NameTable12 in os.listdir():  # цикл для работы с списком ссего
+    for NameTable12 in dirlist:  # цикл для работы с списком ссего
         GL = Thread(target=Groups_List, args=(NameTable12, barrier,))
         GL.start()
     barrier.wait()
@@ -169,7 +171,7 @@ def SchedulePars():
     subjects.clear()
     multisubjects.clear()
     #barrier = Barrier(len(os.listdir()) + 1)
-    for NameTable1 in os.listdir():  # цикл для работы с списком всего
+    for NameTable1 in dirlist:  # цикл для работы с списком всего
         Parser_Table(NameTable1)
 
 
@@ -183,5 +185,6 @@ def SchedulePars():
     for key, value in subjects_grouped_by_weekday.items():
         schedule.insert_subjects(key, value)
     schedule.con.close()
+
 # SchedulePars()
 # schedule.insert_groups(GroupsList())

@@ -91,6 +91,8 @@ class Schedule:
         return None
 
     def select_day_by_user(self, day: str, user: User, week=weeknum()):
+        if day == 'Sunday':
+            return []
         cur = self.cur
         if user.group_id == '':
             cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])

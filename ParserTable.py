@@ -163,10 +163,11 @@ def SchedulePars():
     GroupList = []
     barrier = Barrier(len(dirlist) + 1)
     start = time()
-    for NameTable12 in dirlist:  # цикл для работы с списком ссего
+    for NameTable12 in dirlist:  # цикл для работы со списком названий файлов
         GL = Thread(target=Groups_List, args=(NameTable12, barrier,))
         GL.start()
     barrier.wait()
+    GroupList.sort()
     schedule.insert_groups(GroupList)
 
     # GL = Thread(target = GroupsList, args=(NameTable12,))

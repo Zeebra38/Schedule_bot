@@ -4,6 +4,7 @@ from SubjestClass import Subject
 from UserClass import User
 from utils import weeknum
 
+
 class Schedule:
 
     def __init__(self, path='private/rasp.db'):
@@ -107,9 +108,10 @@ class Schedule:
             where D.group_id = (?)
             and (D.weeks like '{var1}' 
             or D.weeks like '{var2}'
-            or D.weeks like '{var3}')
+            or D.weeks like '{var3}'
+            or D.weeks == '{week}')
             order by D.number""".format(
-                day=day, var1=vars[0], var2=vars[1], var3=vars[2]), [group_id])
+                day=day, var1=vars[0], var2=vars[1], var3=vars[2], week=week), [group_id])
         res = cur.fetchall()
         return res
 

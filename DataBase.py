@@ -1,13 +1,15 @@
 import sqlite3
-
+import time
+from threading import Thread
 from SubjestClass import Subject
 from UserClass import User
 from utils import weeknum
-
+from yadupload import upload_to_disk
 
 class Schedule:
 
     def __init__(self, path='private/rasp.db'):
+        upload_to_disk()
         """Создание соединения с БД. path - путь к БД. con-соединение, cur-курсор"""
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()

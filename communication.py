@@ -108,6 +108,7 @@ def update_schedule():
         os.remove(original)
         os.rename(target, original)
         time.sleep(2)
+
     except Exception as e:
         return str(e)
     return 'Updated successfully'

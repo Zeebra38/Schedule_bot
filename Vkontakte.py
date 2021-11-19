@@ -18,22 +18,22 @@ def thread_gr():
                 if event.from_chat:  # сообщение в группу  # содержание сообщения
                     id = event.chat_id  # IDшник чата
                     vk_raspisanie(id, msg, 0)
-                    msg_id = event.message.conversation_message_id
+
 
     except Exception as rrr:
         with open('logs.txt', 'a', encoding='utf-8') as f:
             f.write(f'{datetime.now()} {rrr} group continue \n')
         try:
             now = datetime.now()
-            if now.hour in [1, 2, 3]:
+            if now.hour in [1, 2, 3, 4, 5, 6]:
                 update_schedule()
-
+                t1.sleep(1800)
             else:
 
                 send(68659003, f'{datetime.now()}  \n  {rrr} group', 2, 1)          #ЛС Мише Р.
                 send(152014637, f'{datetime.now()}  \n  {rrr} group continue', 2, 1)#ЛС Илье Д.
+                t1.sleep(30)
 
-            t1.sleep(1800)
         except Exception as err:
             with open('logs1.txt', 'a', encoding='utf-8') as f:
                 f.write(f'{datetime.now()} {rrr} group continue \n')
@@ -52,7 +52,20 @@ def thread_ls():
                 if event.to_me:  # сообщение в лс сообщества
                     if event.from_user:
                         idid = event.user_id
+
                         vk_raspisanie(idid, msg, 1)
+                        print(msg)
+
+                        if 'выход' in msg:
+                            print("heelloo")
+                            vk123 = vk_session.get_api()
+                            try:
+                                vk123.messages.markAsRead(peer_id=idid)
+
+                                #vk123.messages.markAsRead(mark_conversation_as_read=1)
+                            except KeyError:
+                                send(id, 'Ошибка. Возможно ты пошел нахуй ъыъ', 0, ls)
+
 
 
     except Exception as rrr:
@@ -60,13 +73,14 @@ def thread_ls():
             f.write(f'{datetime.now()} {rrr} ls pass\n')
         try:
             now = datetime.now()
-            if now.hour in [1, 2, 3]:
-                pass
-            else:
-                send(68659003, f'{datetime.now()}  \n  {rrr} group', 2, 1)  # ЛС Мише Р.
-                send(152014637, f'{datetime.now()}  \n  {rrr} group continue', 2, 1)  # ЛС Илье Д.
+            if now.hour in [1, 2, 3, 4, 5, 6]:
+                t1.sleep(1800)
 
-            t1.sleep(1800)
+            else:
+                send(68659003, f'{datetime.now()}  \n  {rrr} ls', 2, 1)  # ЛС Мише Р.
+                send(152014637, f'{datetime.now()}  \n  {rrr} ls continue', 2, 1)  # ЛС Илье Д.
+                t1.sleep(30)
+
         except Exception as rrr:
             with open('logs1.txt', 'a', encoding='utf-8') as f:
                 f.write(f'{datetime.now()} {rrr} ls pass\n')

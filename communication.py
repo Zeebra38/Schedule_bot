@@ -144,7 +144,7 @@ def update_schedule():
         original = path + '/private/rasp.db'
         target = path + '/private/rasp1.db'
         shutil.copyfile(original, target)
-        # download_schedules()
+        download_schedules()
         SchedulePars()
         os.remove(original)
         os.rename(target, original)

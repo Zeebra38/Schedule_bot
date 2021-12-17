@@ -27,7 +27,7 @@ class Schedule:
 
     def insert_subject(self, day: str, subject: Subject):
         cur = self.cur
-        cur.execute("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day), subject.ready_to_insert_data)
+        cur.execute("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day), subject.ready_to_insert_data)
         cur.execute("select * from {}".format(day))
 
     def insert_subjects(self, day: str, subjects: [Subject]):

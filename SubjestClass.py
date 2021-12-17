@@ -30,8 +30,10 @@ class Subject:
         if len(started_weeks) == 0:
             if even:
                 weeks = even_weeks
+
             else:
                 weeks = odd_weeks
+
             name = subj
         else:
             if re.match(r'^кр', subj):
@@ -68,7 +70,6 @@ class MultiSubject:
                 for _ in range(len(b) - len(a)):
                     a.append(a[0])
             return a
-
         if _class is None:
             _class = ''
         _class = str(_class)

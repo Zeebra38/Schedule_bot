@@ -29,17 +29,21 @@ class Subject:
         if len(started_weeks) == 0:
             if even:
                 weeks = even_weeks
+                print("1"+weeks)
             else:
                 weeks = odd_weeks
+                print("2" + weeks)
             name = subj
         else:
             if re.match(r'^кр', subj):
                 if even:
                     set2 = set(started_weeks)
                     weeks = [o for o in even_weeks if o not in set2]
+                    print(set2, weeks)
                 else:
                     set2 = set(started_weeks)
                     weeks = [o for o in odd_weeks if o not in set2]
+                    print("2", set2, weeks)
             else:
                 weeks = started_weeks
             name = subj[subj.find('н') + 1:].strip()

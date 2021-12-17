@@ -148,7 +148,7 @@ def vk_raspisanie(id: int, msg: str, ls: int):
 
         try:
             week = int(msg.split()[1])
-            if 0 < week < 17:
+            if 0 < week < 19:
                 send(id, specify_week_schedule(vk_id = id, week = week), 0, ls)
             else:
                 send(id, f'{week} - недопустимый номер недели', 0, ls)

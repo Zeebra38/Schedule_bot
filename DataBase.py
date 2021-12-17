@@ -1,5 +1,7 @@
 import sqlite3
 
+from typing import List
+
 from SubjestClass import Subject
 from UserClass import User
 from utils import weeknum
@@ -12,7 +14,7 @@ class Schedule:
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
 
-    def insert_groups(self, groups: list[str]):
+    def insert_groups(self, groups: List[str]):
         cur = self.cur
         cur.execute("drop table if exists Groups;")
         cur.execute("""CREATE TABLE "Groups" (

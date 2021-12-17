@@ -1,7 +1,7 @@
 from telebot import TeleBot, types
 from UserClass import User
 from communication import insert_user, today_schedule, nextday_schedule, next_week_schedule, current_week_schedule, \
-    get_current_weeknum, update_schedule, specify_week_schedule
+    get_current_weeknum, update_schedule, specify_week_schedule, user_schedule_on_exams
 from private.config import API_TOKEN
 import threading
 
@@ -57,6 +57,15 @@ def current_week(message: types.Message):
     except KeyError as e:
         bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
+@bot.message_handler(commands=['exams'])
+def current_week(message: types.Message):
+    try:
+        res = ''
+        res += user_schedule_on_exams(message.from_user.id, week=17)
+        res += user_schedule_on_exams(message.from_user.id, week=18)
+        bot.send_message(message.chat.id, res)
+    except KeyError as e:
+        bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
 @bot.message_handler(commands=['nextweek'])
 def next_week(message: types.Message):

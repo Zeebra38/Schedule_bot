@@ -73,7 +73,8 @@ def Parser_Table(name_table):
                             ForMultiSubject = MultiSubject(data_from_cell[:10], NomerPar // 2, chetnost % 2,
                                                            item.value.strip(),
                                                            vid_zanyatiy.value,
-                                                           FIO.value, nomer.value, ssilka.value)
+                                                           FIO.value, nomer.value, ssilka.value,
+                                                           1 if 'зач' in name_table.lower() else 0)
                         except Exception as e:
                             print(str(e))
                             a = 1 / (1 - 1)
@@ -85,7 +86,8 @@ def Parser_Table(name_table):
                         ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2,
                                              item.value.strip().replace('\n', ' '),
                                              vid_zanyatiy.value,
-                                             FIO.value, nomer.value, ssilka.value)
+                                             FIO.value, nomer.value, ssilka.value,
+                                             1 if 'зач' in name_table.lower() else 0)
                         global subjects
                         subjects[ForSubject] = translate_weekday(sheet[DenNedeli][0].value)
                         # subjets.append(ForSubject)

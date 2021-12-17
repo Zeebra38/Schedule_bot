@@ -1,6 +1,5 @@
 import sqlite3
 
-from typing import List
 
 from SubjestClass import Subject
 from UserClass import User
@@ -15,7 +14,7 @@ class Schedule:
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
 
-    def insert_groups(self, groups: List[str]):
+    def insert_groups(self, groups):
         cur = self.cur
         cur.execute("drop table if exists Groups;")
         cur.execute("""CREATE TABLE "Groups" (
@@ -40,7 +39,7 @@ class Schedule:
         data = []
         for i in range(len(group_ids)):
             data.append(list(group_ids[i]) + subjects[i].ready_to_insert_data)
-        cur.executemany("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day),
+        cur.executemany("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day),
                         data)
         cur.execute("select * from {}".format(day))
         self.con.commit()
@@ -78,9 +77,36 @@ class Schedule:
                 "Instructor"	TEXT,
                 "Type"	TEXT NOT NULL,
                 "Class"	TEXT,
-                "Link"	TEXT
+                "Link"	TEXT,
+                'Exam' INTEGER
             ); """.format(day))
         self.con.commit()
+
+    def select_exams(self, day: str, user: User, week):
+        if day == 'Sunday':
+            return []
+        cur = self.cur
+        if user.group_id == '':
+            cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
+            group_id = int(str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', ''))
+        else:
+            group_id = user.group_id
+        vars = [f'{week} %', f'% {week}', f'% {week} %']
+        cur.execute(
+            """select D.number, D.weeks, D.Subject, D.Instructor, D.Type, D.Class
+            from {day} D 
+            left join Groups G on D.group_id = G.group_id
+            where (D.group_id = (?)
+            and (D.weeks like '{var1}' 
+            or D.weeks like '{var2}'
+            or D.weeks like '{var3}'
+            or D.weeks == '{week}'))
+            and D.Exam == '1'
+            order by D.number""".format(
+                day=day, var1=vars[0], var2=vars[1], var3=vars[2], week=week), [group_id])
+        res = cur.fetchall()
+        return res
+
 
     def select_user(self, telegram_id='', vk_id=''):
         cur = self.cur

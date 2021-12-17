@@ -15,7 +15,7 @@ def upload_to_disk(force=False):
     delta = now - time0
     delta_sec = delta.total_seconds()
     delta_hours = divmod(delta_sec, 3600)[0]
-    if fabs(delta_hours) > 1 or force:
+    if fabs(delta_hours) > 0 or force:
         time0 = datetime.datetime.now()
         try:
             if y.exists('/Data/Schedule_bot/rasp.db'):

@@ -42,6 +42,32 @@ def user_schedule_on_day(telegram_id='', vk_id='', week=None, day=None, weekday=
     return res
 
 
+def user_schedule_on_exam(telegram_id='', vk_id='', week=None, day=None, weekday=''):
+    schedule = Schedule()
+    if week is None:
+        week = weeknum()
+    if day is None:
+        day = date.today()
+    if schedule.select_user(telegram_id, vk_id) is None:
+        raise KeyError("Пользователь не зарегистрирован")
+    user = schedule.select_user(telegram_id=telegram_id, vk_id=vk_id)
+    if weekday == '':
+        day = calendar.day_name[day.weekday()]
+    else:
+        day = weekday
+    select_res = schedule.select_exams(day, user, week)
+    res = f'{schedule.select_group_name(user.group_id)} {weekdays_en[day]} {week} неделя:\n'
+    for subj in select_res:
+        subj = list(subj)
+        subj[0] = f'{subj[0]} {get_subj_time(int(subj[0]))}'
+        subj.pop(1)
+        new_subj = [str(el).replace('\n', ' ') if el != '' else '---' for el in subj]
+        res += ' '.join(new_subj) + '\n'
+    if len(select_res) == 0:
+        res = ''
+    schedule.con.close()
+    return res
+
 def user_schedule_on_week(telegram_id='', vk_id='', week=None):
     schedule = Schedule()
     if week is None:
@@ -55,6 +81,18 @@ def user_schedule_on_week(telegram_id='', vk_id='', week=None):
     schedule.con.close()
     return res
 
+def user_schedule_on_exams(telegram_id='', vk_id='', week=None):
+    schedule = Schedule()
+    if week is None:
+        week = weeknum()
+    if schedule.select_user(telegram_id, vk_id) is None:
+        raise KeyError("Пользователь не зарегистрирован")
+    days = list(calendar.day_name)[:-1]
+    res = ''
+    for day in days:
+        res += user_schedule_on_exam(telegram_id, vk_id, week, weekday=day) + '\n'
+    schedule.con.close()
+    return res
 
 def today_schedule(telegram_id='', vk_id=''):
     return user_schedule_on_day(telegram_id, vk_id)
@@ -69,6 +107,9 @@ def nextday_schedule(telegram_id='', vk_id=''):
 
 def current_week_schedule(telegram_id='', vk_id=''):
     return user_schedule_on_week(telegram_id, vk_id)
+
+def current_exam_schedule(telegram_id='', vk_id=''):
+    return user_schedule_on_exams(telegram_id, vk_id, 17) + user_schedule_on_exams(telegram_id, vk_id, 18)
 
 
 def specify_week_schedule(telegram_id='', vk_id='', week=1):
@@ -103,12 +144,13 @@ def update_schedule():
         original = path + '/private/rasp.db'
         target = path + '/private/rasp1.db'
         shutil.copyfile(original, target)
-        download_schedules()
+        # download_schedules()
         SchedulePars()
         os.remove(original)
         os.rename(target, original)
         time.sleep(2)
 
     except Exception as e:
+        print(e)
         return str(e)
     return 'Updated successfully'

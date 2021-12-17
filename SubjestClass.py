@@ -8,7 +8,7 @@ class Subject:
     instructor - преподаватель str, _class  - аудитория str, link - ссылка str
     """
 
-    def __init__(self, group_name, number, even, subj, _type, instructor, _class, link):
+    def __init__(self, group_name, number, even, subj, _type, instructor, _class, link, exam=0):
         self.group_name = group_name
         self.number = number
         self.even = even
@@ -17,8 +17,9 @@ class Subject:
         self._class = str(_class) if _class is not None else ''
         self.link = link if link is not None else ''
         self.name, self.weeks = self.set_up_subject(subj, even)
+        self.exam = exam
         self.ready_to_insert_data = [self.number, self.even, " ".join(self.weeks), self.name, self._type,
-                                     self.instructor, self._class, self.link]
+                                     self.instructor, self._class, self.link, self.exam]
 
     def set_up_subject(self, subj, even):
         subj = subj.replace('.', ',').replace(',', ' ')
@@ -29,10 +30,8 @@ class Subject:
         if len(started_weeks) == 0:
             if even:
                 weeks = even_weeks
-                print("1"+weeks)
             else:
                 weeks = odd_weeks
-                print("2" + weeks)
             name = subj
         else:
             if re.match(r'^кр', subj):
@@ -63,12 +62,13 @@ class MultiSubject:
     классе Subject. Будет происходить split по '\n'. Чтобы обращаться к предметам внутри есть свойство subjects,
     возвращающее массив Subject"""
 
-    def __init__(self, group_name, number, even, subj, _type, instructor, _class, link):
+    def __init__(self, group_name, number, even, subj, _type, instructor, _class, link, exam=0):
         def increase_arguments(a, b):
             if len(a) < len(b):
                 for _ in range(len(b) - len(a)):
                     a.append(a[0])
             return a
+
         if _class is None:
             _class = ''
         _class = str(_class)
@@ -87,4 +87,4 @@ class MultiSubject:
         links = increase_arguments(links, subjs)
         self.subjects = []
         for subj, _type, instructor, _class, link in zip(subjs, types, instructors, classes, links):
-            self.subjects.append(Subject(group_name, number, even, subj, _type, instructor, _class, link))
+            self.subjects.append(Subject(group_name, number, even, subj, _type, instructor, _class, link, exam))

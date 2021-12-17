@@ -161,7 +161,7 @@ def vk_raspisanie(id: int, msg: str, ls: int):
         except Exception as e:
             send(id, str(e), 0, ls)
 
-    if "зачеты" in msg:
+    if "номер недели" in msg:
 
         try:
 
@@ -169,11 +169,11 @@ def vk_raspisanie(id: int, msg: str, ls: int):
         except IndexError as e:
             send(id, str(e), 0, ls)
 
-    if "номер недели" in msg:
+    if "зачеты" in msg:
 
         try:
 
-            send(id, current_exam_schedule(), 0, ls)
+            send(id, current_exam_schedule(vk_id = id), 0, ls)
         except IndexError as e:
             send(id, str(e), 0, ls)
 

@@ -40,11 +40,11 @@ class Subject:
                 if even:
                     set2 = set(started_weeks)
                     weeks = [o for o in even_weeks if o not in set2]
-                    print(set2, weeks)
+
                 else:
                     set2 = set(started_weeks)
                     weeks = [o for o in odd_weeks if o not in set2]
-                    print("2", set2, weeks)
+
             else:
                 weeks = started_weeks
             name = subj[subj.find('н') + 1:].strip()

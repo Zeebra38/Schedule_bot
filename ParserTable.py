@@ -14,9 +14,12 @@ GroupList = []
 subjects = {}
 multisubjects = {}
 
+exams = []
 
-def Parser_Table(name_table):
+
+def Parser_Table_For_Exams(name_table):
     # name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
+
     start = time()
 
     group_list_local = []
@@ -27,10 +30,10 @@ def Parser_Table(name_table):
     wb = openpyxl.load_workbook(name_table)
     sheets_list = wb.sheetnames
     sheet_active = wb[sheets_list[0]]
-    row_max = 2
+    row_max = 3
     column_max = sheet_active.max_column
     # print(column_max, ' ', row_max) # проверка количества строк и столбцов
-    row_min = 2
+    row_min = 3
     column_min = 1
     while column_min <= column_max:
         row_min_min = row_min
@@ -47,14 +50,85 @@ def Parser_Table(name_table):
         # print(data_from_cell)
         if len(data_from_cell) > 9:
             if data_from_cell[4] == '-' and data_from_cell[7] == '-' and data_from_cell not in group_list_local:
-                # print('Нашли в ячейке:', column_min, " ", row_min_min)
-                # print(data_from_cell)
-                # print(sheet[2][int(column_min) - 1].value[0:10])
-                # pass
                 group_list_local.append(data_from_cell)
-                # if 'БПБО-02-19' in data_from_cell:
-                # print('Бпбо-02-19 находится в ячейке:', column_min, " ", row_min_min)
-                # print(get_column_letter(column_min), get_column_letter(column_min+4))
+                # print(data_from_cell, column_min, " ", row_min_min)
+                cells = sheet[get_column_letter(column_min) + '4':get_column_letter(column_min + 3) + '59']
+                subjets = []
+                day_week = 0
+                if cells != None:
+                    timez = 0
+                    type_par = 0
+                    nomer = 0
+                    FIO = 0
+                    item = 0
+                    k = 0
+                    day = 0
+                    for cell, cell1, cell2, cell3 in cells:
+                        day_week += 1
+                        if day_week == 1:
+                            type_par = cell
+                            timez = cell1
+                            nomer = cell2
+                            if cell.value is not None:
+                                day = sheet[cell.row][2]
+
+                        if day_week == 2:
+                            item = cell
+                        if day_week == 3:
+                            FIO = cell
+
+                        if day_week == 3:
+                            if type_par.value is not None:
+                                #    print(data_from_cell[:10], item.value.strip().replace('\n', ' '),timez.value,FIO.value, nomer.value,2 if 'экз' in name_table.lower() else 0, type_par.value, day.value)
+                                exams.append([data_from_cell[:10], day.value.strip().replace('\n', ' '), timez.value,
+                                              type_par.value, item.value, FIO.value, nomer.value])
+                            k += 1
+                            day_week = 0
+                            if k == 6:
+                                k = 0
+                                day_week = -1
+
+        row_min_min = int(row_min_min)
+
+        column_min = column_min + 1
+    print(time() - start, name_table)
+    wb.close()
+    table.close()
+
+def Parser_Table(name_table):
+
+    start = time()
+
+    group_list_local = []
+    table = openpyxl.open(name_table, read_only=True)
+
+    sheet = table.active
+
+    wb = openpyxl.load_workbook(name_table)
+    sheets_list = wb.sheetnames
+    sheet_active = wb[sheets_list[0]]
+    row_max = 2
+    column_max = sheet_active.max_column
+    row_min = 2
+    column_min = 1
+    while column_min <= column_max:
+        row_min_min = row_min
+        row_max_max = row_max
+
+        row_min_min = str(row_min_min)
+
+        word_column = get_column_letter(column_min)
+        word_column = str(word_column)
+        word_cell = word_column + row_min_min
+
+        data_from_cell = sheet_active[word_cell].value
+        data_from_cell = str(data_from_cell)
+
+        if len(data_from_cell) > 9:
+            if data_from_cell[4] == '-' and data_from_cell[7] == '-' and data_from_cell not in group_list_local:
+
+                group_list_local.append(data_from_cell)
+
                 cells = sheet[get_column_letter(column_min) + '4':get_column_letter(column_min + 4) + '75']
                 chetnost = 0
                 NomerPar = 2
@@ -64,7 +138,7 @@ def Parser_Table(name_table):
 
                     if NomerPar == 14:
                         NomerPar -= 12
-                        # schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), subjets)
+
                         subjets.clear()
                         DenNedeli += 12
 
@@ -80,7 +154,7 @@ def Parser_Table(name_table):
                             a = 1 / (1 - 1)
                         global multisubjects
                         multisubjects[ForMultiSubject] = translate_weekday(sheet[DenNedeli][0].value)
-                        # schedule.insert_subjects(translate_weekday(sheet[DenNedeli][0].value), ForMultiSubject.subjects)#инглишменский день
+
 
                     elif item.value != None:
                         ForSubject = Subject(data_from_cell[:10], NomerPar // 2, chetnost % 2,
@@ -90,10 +164,9 @@ def Parser_Table(name_table):
                                              1 if 'зач' in name_table.lower() else 0)
                         global subjects
                         subjects[ForSubject] = translate_weekday(sheet[DenNedeli][0].value)
-                        # subjets.append(ForSubject)
 
-                    # print(item.value, vid_zanyatiy.value, FIO.value, nomer.value,
-                    #        ssilka.value, NomerPar//2, sheet[DenNedeli][0].value, chetnost % 2)
+
+
                     chetnost += 1
                     NomerPar += 1
 
@@ -103,13 +176,10 @@ def Parser_Table(name_table):
     print(time() - start, name_table)
     wb.close()
     table.close()
-    # print(sheet[5][0].value) #row_min_min -1
-    # barrier.wait()
-    # return ForMultiSubject
 
 
-def Groups_List(name_table, barrier):
-    # name_table = "schedules\КБиСП 2 курс 2 сем-Д (3).xlsx"  # потом может удалить
+
+def Groups_List(name_table):
 
     table = openpyxl.open(name_table, read_only=True)
 
@@ -136,52 +206,49 @@ def Groups_List(name_table, barrier):
 
         data_from_cell = sheet_active[word_cell].value
         data_from_cell = str(data_from_cell)
-        # print(data_from_cell)
+
         if len(data_from_cell) > 9:
             if data_from_cell[4] == '-' and data_from_cell[7] == '-' and data_from_cell[:10] not in GroupList:
-                # print('Нашли в ячейке:', column_min, " ", row_min_min)
-                # print(data_from_cell)
-                # print(sheet[2][int(column_min) - 1].value[0:10])
+
 
                 GroupList.append(data_from_cell[0:10])
         row_min_min = int(row_min_min)
 
         column_min = column_min + 1
-    # print(GroupList)
-    # return GroupList
     wb.close()
     table.close()
-    barrier.wait()
+
 
 
 def SchedulePars():
     schedule = Schedule(path='private/rasp1.db')
     schedule.drop_tables()
     os.chdir('./schedules')  # переход на работу с другой директорией
-    # print(os.listdir()) # весь список всего
     dirlist = ['./schedules/' + el for el in os.listdir()]
     os.chdir('../')
     global GroupList
     GroupList = []
-    barrier = Barrier(len(dirlist) + 1)
+
     start = time()
     for NameTable12 in dirlist:  # цикл для работы с списком ссего
-        GL = Thread(target=Groups_List, args=(NameTable12, barrier,))
-        GL.start()
-    barrier.wait()
+        Groups_List(NameTable12)
     GroupList.sort()
     schedule.insert_groups(GroupList)
 
-    # GL = Thread(target = GroupsList, args=(NameTable12,))
-    # GL.start()
-    # GL.join()
 
     global subjects, multisubjects
     subjects.clear()
     multisubjects.clear()
-    # barrier = Barrier(len(os.listdir()) + 1)
+
     for NameTable1 in dirlist:  # цикл для работы с списком всего
         Parser_Table(NameTable1)
+
+    if Exams != 0:
+        global exams
+        exams.clear()
+        for NameTable1 in dirlist:  # цикл для работы с списком экзов
+            if "экз" or "ekz" in NameTable1:
+                Parser_Table_For_Exams(NameTable1)
 
     print(time() - start)
     for key, value in multisubjects.items():

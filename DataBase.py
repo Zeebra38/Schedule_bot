@@ -14,8 +14,7 @@ class Schedule:
         self.cur = self.con.cursor()
 
     def __del__(self):
-        # Thread(target=upload_to_disk).start()
-        pass
+        Thread(target=upload_to_disk).start()
 
     def insert_groups(self, groups):
         cur = self.cur

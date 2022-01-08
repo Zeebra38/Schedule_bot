@@ -55,7 +55,7 @@ def user_schedule_on_exam(telegram_id='', vk_id='', week=None, day=None, weekday
         day = calendar.day_name[day.weekday()]
     else:
         day = weekday
-    select_res = schedule.select_exams(day, user, week)
+    select_res = schedule.select_first_exams(day, user, week)
     res = f'{schedule.select_group_name(user.group_id)} {weekdays_en[day]} {week} неделя:\n'
     for subj in select_res:
         subj = list(subj)
@@ -104,13 +104,20 @@ def nextday_schedule(telegram_id='', vk_id=''):
         week += 1
     return user_schedule_on_day(telegram_id, vk_id, day=date.today() + timedelta(days=1), week=week)
 
+def current_main_exams_schedule(telegram_id='', vk_id=''):
+    schedule = Schedule()
+    res = ""
+    for exam in schedule.select_main_exams(schedule.select_user(telegram_id, vk_id)):
+        res += ' '.join(list(map(str, exam)))
+        res += '\n'
+    schedule.con.close()
+    return res
 
 def current_week_schedule(telegram_id='', vk_id=''):
     return user_schedule_on_week(telegram_id, vk_id)
 
-def current_exam_schedule(telegram_id='', vk_id=''):
+def current_first_exams_schedule(telegram_id='', vk_id=''):
     return user_schedule_on_exams(telegram_id, vk_id, 17) + user_schedule_on_exams(telegram_id, vk_id, 18)
-
 
 def specify_week_schedule(telegram_id='', vk_id='', week=1):
     return user_schedule_on_week(telegram_id, vk_id, week)
@@ -146,10 +153,10 @@ def update_schedule():
         shutil.copyfile(original, target)
         download_schedules()
         SchedulePars()
+        SchedulePars(1)
         os.remove(original)
         os.rename(target, original)
         time.sleep(2)
-
     except Exception as e:
         print(e)
         return str(e)

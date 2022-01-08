@@ -1,18 +1,21 @@
 import sqlite3
-
-
+from threading import Thread
 from SubjestClass import Subject
 from UserClass import User
 from utils import weeknum
 from yadupload import upload_to_disk
+from typing import List
 
 class Schedule:
 
     def __init__(self, path='private/rasp.db'):
-        upload_to_disk()
         """Создание соединения с БД. path - путь к БД. con-соединение, cur-курсор"""
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
+
+    def __del__(self):
+        # Thread(target=upload_to_disk).start()
+        pass
 
     def insert_groups(self, groups):
         cur = self.cur
@@ -27,7 +30,8 @@ class Schedule:
 
     def insert_subject(self, day: str, subject: Subject):
         cur = self.cur
-        cur.execute("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day), subject.ready_to_insert_data)
+        cur.execute("""insert into {} values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""".format(day),
+                    subject.ready_to_insert_data)
         cur.execute("select * from {}".format(day))
 
     def insert_subjects(self, day: str, subjects: [Subject]):
@@ -43,6 +47,22 @@ class Schedule:
                         data)
         cur.execute("select * from {}".format(day))
         self.con.commit()
+
+    def insert_exams(self, ready_to_insert_data: List[List]):
+        cur = self.cur
+        group_names = []
+        for i in range(len(ready_to_insert_data)):
+            group_names.append(ready_to_insert_data[i].pop(0))
+        group_ids = []
+        for group_name in group_names:
+            cur.execute("select group_id from Groups where group_name == (?)", [group_name])
+            group_ids.append(cur.fetchone())
+        data = []
+        for i in range(len(group_ids)):
+            data.append(list(group_ids[i]) + ready_to_insert_data[i])
+        cur.executemany("""insert into Exams values (?, ?, ?, ?, ?, ?, ?)""", data)
+        self.con.commit()
+
 
     def insert_user(self, user: User):
         cur = self.cur
@@ -80,9 +100,19 @@ class Schedule:
                 "Link"	TEXT,
                 'Exam' INTEGER
             ); """.format(day))
+        cur.execute("DROP TABLE IF EXISTS Exams")
+        cur.execute("""CREATE TABLE Exams(
+                        group_id INTEGER NOT NULL,
+                        Date_weekday TEXT NOT NULL ,
+                        Start_time TEXT NOT NULL,
+                        Type TEXT NOT NULL,
+                        Subject TEXT NOT NULL,
+                        Instructor TEXT,
+                        Class TEXT
+                    );""")
         self.con.commit()
 
-    def select_exams(self, day: str, user: User, week):
+    def select_first_exams(self, day: str, user: User, week):
         if day == 'Sunday':
             return []
         cur = self.cur
@@ -104,6 +134,18 @@ class Schedule:
             and D.Exam == '1'
             order by D.number""".format(
                 day=day, var1=vars[0], var2=vars[1], var3=vars[2], week=week), [group_id])
+        res = cur.fetchall()
+        return res
+
+    def select_main_exams(self, user: User):
+        cur = self.cur
+        if user.group_id == '':
+            cur.execute("select group_id from Groups where group_name == (?)", [user.group_name])
+            group_id = int(str(cur.fetchone()).replace('(', '').replace(')', '').replace(',', ''))
+        else:
+            group_id = user.group_id
+        cur.execute("""SELECT Date_weekday, Type, Subject, Instructor, Class FROM Exams
+        where group_id = (?)""", [group_id])
         res = cur.fetchall()
         return res
 

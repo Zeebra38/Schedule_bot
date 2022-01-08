@@ -220,7 +220,7 @@ def Groups_List(name_table):
 
 
 
-def SchedulePars():
+def SchedulePars(Exams = 0):
     schedule = Schedule(path='private/rasp1.db')
     schedule.drop_tables()
     os.chdir('./schedules')  # переход на работу с другой директорией
@@ -235,30 +235,34 @@ def SchedulePars():
     GroupList.sort()
     schedule.insert_groups(GroupList)
 
-
-    global subjects, multisubjects
-    subjects.clear()
-    multisubjects.clear()
-
-    for NameTable1 in dirlist:  # цикл для работы с списком всего
-        Parser_Table(NameTable1)
-
     if Exams != 0:
         global exams
         exams.clear()
         for NameTable1 in dirlist:  # цикл для работы с списком экзов
             if "экз" or "ekz" in NameTable1:
                 Parser_Table_For_Exams(NameTable1)
+        schedule.insert_exams(exams)
 
+    else:
+        global subjects, multisubjects
+        subjects.clear()
+        multisubjects.clear()
+
+        for NameTable1 in dirlist:  # цикл для работы с списком всего
+            Parser_Table(NameTable1)
+
+
+        for key, value in multisubjects.items():
+            schedule.insert_subjects(value, key.subjects)
+        subjects_grouped_by_weekday = {key: [] for key in 'Monday Tuesday Wednesday Thursday Friday Saturday'.split()}
+        for key, value in subjects.items():
+            subjects_grouped_by_weekday[value].append(key)
+        for key, value in subjects_grouped_by_weekday.items():
+            schedule.insert_subjects(key, value)
     print(time() - start)
-    for key, value in multisubjects.items():
-        schedule.insert_subjects(value, key.subjects)
-    subjects_grouped_by_weekday = {key: [] for key in 'Monday Tuesday Wednesday Thursday Friday Saturday'.split()}
-    for key, value in subjects.items():
-        subjects_grouped_by_weekday[value].append(key)
-    for key, value in subjects_grouped_by_weekday.items():
-        schedule.insert_subjects(key, value)
     schedule.con.close()
 
 # SchedulePars()
 # schedule.insert_groups(GroupsList())
+
+# SchedulePars(1)

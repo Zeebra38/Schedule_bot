@@ -1,7 +1,7 @@
 import os
 import shutil
 import threading
-
+import pyexcel as p
 import requests
 from bs4 import BeautifulSoup
 
@@ -42,5 +42,6 @@ def download_schedules():
     for link in links:
         threading.Thread(target=download, args=[link, barrier]).start()
     barrier.wait()
-
-#download_schedules()
+    for file_name in os.listdir('schedules/'):
+        if '.xlsx' not in file_name:
+            p.save_book_as(file_name=file_name, dest_file_name='schedules/' + file_name[:-4] + '.xlsx')

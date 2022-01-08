@@ -1,4 +1,5 @@
 import os
+import pytz
 import threading
 import time as t1
 from datetime import datetime, time
@@ -8,6 +9,10 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from VKUtils import vk_raspisanie, send
 from private.config import vk_session
 from communication import update_schedule
+
+my_tz = pytz.timezone("Europe/Moscow")
+
+
 def thread_gr():
     try:
 
@@ -22,21 +27,21 @@ def thread_gr():
 
     except Exception as rrr:
         with open('logs.txt', 'a', encoding='utf-8') as f:
-            f.write(f'{datetime.now()} {rrr} group continue \n')
+            f.write(f'{datetime.now(my_tz)} {rrr} group continue \n')
         try:
-            now = datetime.now()
+            now = datetime.now(my_tz)
             if now.hour in [1, 2, 3, 4, 5, 6]:
                 update_schedule()
                 t1.sleep(1800)
             else:
 
-                send(68659003, f'{datetime.now()}  \n  {rrr} group', 2, 1)          #ЛС Мише Р.
-                send(152014637, f'{datetime.now()}  \n  {rrr} group continue', 2, 1)#ЛС Илье Д.
+                send(68659003, f'{datetime.now(my_tz)}  \n  {rrr} group', 2, 1)  # ЛС Мише Р.
+                send(152014637, f'{datetime.now(my_tz)}  \n  {rrr} group continue', 2, 1)  # ЛС Илье Д.
                 t1.sleep(30)
 
         except Exception as err:
             with open('logs1.txt', 'a', encoding='utf-8') as f:
-                f.write(f'{datetime.now()} {rrr} group continue \n')
+                f.write(f'{datetime.now(my_tz)} {rrr} group continue \n')
             t1.sleep(1800)
         threading.Thread(target=thread_gr).start()
 
@@ -62,7 +67,7 @@ def thread_ls():
                             try:
                                 vk123.messages.markAsRead(peer_id=idid)
 
-                                #vk123.messages.markAsRead(mark_conversation_as_read=1)
+                                # vk123.messages.markAsRead(mark_conversation_as_read=1)
                             except KeyError:
                                 send(id, 'Ошибка. Возможно ты пошел нахуй ъыъ', 0, ls)
 
@@ -70,20 +75,20 @@ def thread_ls():
 
     except Exception as rrr:
         with open('logs.txt', 'a', encoding='utf-8') as f:
-            f.write(f'{datetime.now()} {rrr} ls pass\n')
+            f.write(f'{datetime.now(my_tz)} {rrr} ls pass\n')
         try:
-            now = datetime.now()
+            now = datetime.now(my_tz)
             if now.hour in [1, 2, 3, 4, 5, 6]:
                 t1.sleep(1800)
 
             else:
-                send(68659003, f'{datetime.now()}  \n  {rrr} ls', 2, 1)  # ЛС Мише Р.
-                send(152014637, f'{datetime.now()}  \n  {rrr} ls continue', 2, 1)  # ЛС Илье Д.
+                send(68659003, f'{datetime.now(my_tz)}  \n  {rrr} ls', 2, 1)  # ЛС Мише Р.
+                send(152014637, f'{datetime.now(my_tz)}  \n  {rrr} ls continue', 2, 1)  # ЛС Илье Д.
                 t1.sleep(30)
 
         except Exception as rrr:
             with open('logs1.txt', 'a', encoding='utf-8') as f:
-                f.write(f'{datetime.now()} {rrr} ls pass\n')
+                f.write(f'{datetime.now(my_tz)} {rrr} ls pass\n')
             t1.sleep(1800)
         threading.Thread(target=thread_ls).start()
         # x.start()
@@ -94,6 +99,7 @@ def vk_polling():
     x2 = threading.Thread(target=thread_gr)
     x1.start()
     x2.start()
+
 
 """ 
 1. Сделать вывод расписания на сегодня - завтра

@@ -2,7 +2,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from private.config import vk_session
 from vk_api.utils import get_random_id
 from communication import insert_user, today_schedule, nextday_schedule, next_week_schedule, current_week_schedule, \
-    get_current_weeknum, specify_week_schedule, current_exam_schedule
+    get_current_weeknum, specify_week_schedule, current_first_exams_schedule, current_main_exams_schedule
 from UserClass import User
 
 vk = vk_session.get_api()
@@ -173,10 +173,17 @@ def vk_raspisanie(id: int, msg: str, ls: int):
 
         try:
 
-            send(id, current_exam_schedule(vk_id = id), 0, ls)
+            send(id, current_first_exams_schedule(vk_id = id), 0, ls)
         except IndexError as e:
             send(id, str(e), 0, ls)
 
+    if "экзамены" in msg:
+
+        try:
+
+            send(id, current_main_exams_schedule(vk_id=id), 0, ls)
+        except IndexError as e:
+            send(id, str(e), 0, ls)
 
     if 'расписание на сегодня' in msg:
 
